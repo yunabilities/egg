@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>boiled egg timer !~</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #fae799;
+      text-align: center;
+      padding: 50px;
+      color: #ffffff;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #ffffff;
+    }
+    button {
+      background-color: #F6F0F0;
+      border: none;
+      border-radius: 20px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      margin: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #ffffff;
+    }
+    #countdown {
+      margin-top: 20px;
+      font-size: 3em;
+      color: #F6F0F0;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.5em;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🥚 Egg Timer ₊˚⊹ ᰔ</h1>
+  <p>what type of boiled egg would you like?:</p>
+
+  <button onclick="startTimer(6, 'Soft Egg Ready! Gooey and golden! 🍳✨')">🥚 Soft Boiled (6 min)</button>
+  <button onclick="startTimer(10, 'Hard Egg Ready! Firm and plump! 🥚🌟')">🥚 Hard Boiled (10 min)</button>
+
+  <div id="message"></div>
+  <div id="countdown"></div>
+  <button id="pauseBtn" onclick="togglePause()" style="display:none;">Pause</button>
+  <button id="stopBtn" onclick="stopTimer()" style="display:none;">Stop</button>
+  <button id="resetBtn" onclick="resetTimer()" style="display:none;">Reset</button>
+  <button id="homeBtn" onclick="location.reload()" style="display:none;">Home</button>
+
+  <script>
+    let timer, countdownInterval;
+    let remainingTime = 0;
+    let initialTime = 0;
+    let isPaused = false;
+    let doneMessageGlobal = '';
+    const alarmSoundUrl = 'https://www.zedge.net/ringtones/0fb9c724-3667-3f8f-bdd1-2f4a012cdfd8';
+
+    function startTimer(minutes, doneMessage) {
+      // hide credit when timer starts
+      document.getElementById('credit').style.display = 'none';
+
+      clearTimeout(timer);
+      clearInterval(countdownInterval);
+      isPaused = false;
+
+      initialTime = minutes * 60000;
+      remainingTime = initialTime;
+      doneMessageGlobal = doneMessage;
+
+      document.getElementById('pauseBtn').style.display = 'inline-block';
+      document.getElementById('stopBtn').style.display = 'inline-block';
+      document.getElementById('resetBtn').style.display = 'none';
+      document.getElementById('homeBtn').style.display = 'none';
+
+      document.getElementById('message').textContent = `⏳ Timer started for ${minutes} minutes!`;
+      updateCountdownDisplay();
+      countdownInterval = setInterval(tick, 1000);
+      timer = setTimeout(finishTimer, remainingTime);
+    }
+
+    function tick() {
+      if (remainingTime <= 0) return;
+      remainingTime -= 1000;
+      updateCountdownDisplay();
+    }
+
+    function updateCountdownDisplay() {
+      const mins = Math.floor(remainingTime / 60000);
+      const secs = Math.floor((remainingTime % 60000) / 1000);
+      document.getElementById('countdown').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function finishTimer() {
+      clearInterval(countdownInterval);
+      document.getElementById('countdown').textContent = '';
+      document.getElementById('message').textContent = doneMessageGlobal;
+      playChime();
+      document.getElementById('pauseBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('resetBtn').style.display = 'inline-block';
+      document.getElementById('homeBtn').style.display = 'inline-block';
+    }
+
+    function togglePause() {
+      if (!isPaused) {
+        clearTimeout(timer);
+        clearInterval(countdownInterval);
+        isPaused = true;
+        document.getElementById('pauseBtn').textContent = 'Resume';
+        document.getElementById('message').textContent = '⏸️ Paused';
+      } else {
+        resumeTimer();
+      }
+    }
+
+    function stopTimer() {
+      clearTimeout(timer);
+      clearInterval(countdownInterval);
+      isPaused = true;
+      document.getElementById('message').textContent = '🛑 Stopped';
+      document.getElementById('pauseBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('resetBtn').style.display = 'inline-block';
+      document.getElementById('homeBtn').style.display = 'inline-block';
+    }
+
+    function resumeTimer() {
+      if (remainingTime > 0) {
+        isPaused = false;
+        document.getElementById('message').textContent = '⏳ Resumed';
+        document.getElementById('pauseBtn').style.display = 'inline-block';
+        document.getElementById('stopBtn').style.display = 'inline-block';
+        countdownInterval = setInterval(tick, 1000);
+        timer = setTimeout(finishTimer, remainingTime);
+      }
+    }
+
+    function resetTimer() {
+      clearTimeout(timer);
+      clearInterval(countdownInterval);
+      remainingTime = initialTime;
+      updateCountdownDisplay();
+      document.getElementById('message').textContent = '🔄 Reset';
+      document.getElementById('pauseBtn').style.display = 'inline-block';
+      document.getElementById('stopBtn').style.display = 'inline-block';
+      countdownInterval = setInterval(tick, 1000);
+      timer = setTimeout(finishTimer, remainingTime);
+    }
+
+    function playChime() {
+      const sound = new Audio(alarmSoundUrl);
+      sound.play().catch(err => console.warn('Could not play sound:', err));
+    }
+  </script>
+
+  <div id="credit">Made by jax :></div>
+</body>
+</html>
